@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boris — Tailleur de Pierre</title>
+
+  <!-- =============================================
+       POLICES — changez les noms ici pour changer la typo
+       Trouvez d'autres polices sur : fonts.google.com
+  ============================================= -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+
+  <style>
+
+    /* =============================================
+       COULEURS — tout le site change si vous modifiez ces 4 lignes
+    ============================================= */
+    :root {
+      --couleur-fond:       #1a1612;   /* fond principal (sombre) */
+      --couleur-texte:      #f0ebe2;   /* texte principal (clair) */
+      --couleur-accent:     #b8963e;   /* doré — titres, bordures, boutons */
+      --couleur-texte-gris: #9a9080;   /* texte secondaire, sous-titres */
+    }
+
+    /* =============================================
+       BASE
+    ============================================= */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--couleur-fond);
+      color: var(--couleur-texte);
+
+      /* POLICE DU TEXTE COURANT — changez "Lato" par une autre police */
+      font-family: 'Lato', sans-serif;
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    h1, h2, h3 {
+      /* POLICE DES TITRES — changez "Playfair Display" par une autre police */
+      font-family: 'Playfair Display', serif;
+      color: var(--couleur-texte);
+      line-height: 1.2;
+    }
+
+    a { color: var(--couleur-accent); text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    section { padding: 80px 40px; max-width: 1100px; margin: 0 auto; }
+
+
+    /* =============================================
+       BARRE DE NAVIGATION
+    ============================================= */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(26, 22, 18, 0.95);
+      border-bottom: 1px solid var(--couleur-accent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 40px;
+    }
+
+    /* NOM DANS LA BARRE DE NAV */
+    .nav-logo {
+      font-family: 'Playfair Display', serif;  /* police du logo nav */
+      font-size: 1rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--couleur-texte);
+    }
+
+    /* LIENS DU MENU */
+    nav ul { list-style: none; display: flex; gap: 35px; }
+    nav ul a {
+      font-size: 0.82rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--couleur-texte-gris);
+      transition: color 0.2s;
+    }
+    nav ul a:hover { color: var(--couleur-accent); }
+
+
+    /* =============================================
+       SECTION ACCUEIL — grande photo avec hotspots
+    ============================================= */
+    #accueil {
+      position: relative;
+      height: 100vh;
+      max-width: 100%;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* PHOTO DE FOND — remplacez l'URL par le chemin de votre photo */
+    .hero-photo {
+      position: absolute;
+      inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=80');
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.4);  /* assombrissement : 0.3 = plus sombre, 0.6 = plus clair */
+    }
+
+    /* TITRE CENTRAL */
+    .hero-texte {
+      position: relative;
+      text-align: center;
+    }
+    .hero-texte h1 {
+      font-size: 5rem;  /* taille du titre principal — ex: 4rem, 6rem */
+      color: var(--couleur-texte);
+      margin-bottom: 12px;
+    }
+    .hero-texte p {
+      font-size: 0.9rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--couleur-accent);
+    }
+
+    /* POINTS CLIQUABLES SUR LA PHOTO
+       Déplacez les points en changeant top/left (en % de la hauteur/largeur de l'écran) */
+    .hotspot {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .hotspot-rond {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--couleur-accent);
+      border: 2px solid white;
+    }
+    .hotspot-label {
+      font-size: 0.78rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: white;
+      background: rgba(0,0,0,0.65);
+      padding: 4px 12px;
+      border-left: 2px solid var(--couleur-accent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .hotspot:hover .hotspot-label { opacity: 1; }
+
+    /* Position du hotspot "À propos" */
+    .hs-boris   { top: 40%; left: 20%; }
+    /* Position du hotspot "Galerie" */
+    .hs-galerie { top: 55%; left: 65%; }
+    /* Position du hotspot "Contact" */
+    .hs-contact { top: 70%; left: 40%; }
+
+
+    /* =============================================
+       SECTION À PROPOS DE BORIS
+    ============================================= */
+    .deux-colonnes {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    /* PHOTO DE BORIS */
+    .photo-boris {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      filter: grayscale(20%);
+    }
+
+    /* TEXTE */
+    .sous-titre {
+      font-size: 0.78rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--couleur-accent);
+      margin-bottom: 10px;
+    }
+    .texte-section p { color: var(--couleur-texte-gris); margin-bottom: 16px; }
+
+    /* CITATION */
+    .citation {
+      border-left: 3px solid var(--couleur-accent);
+      padding-left: 20px;
+      margin: 24px 0;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--couleur-texte);
+    }
+
+    /* CHIFFRES CLÉS */
+    .stats { display: flex; gap: 30px; margin-top: 30px; flex-wrap: wrap; }
+    .stat-chiffre {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--couleur-accent);
+    }
+    .stat-texte { font-size: 0.78rem; letter-spacing: 2px; text-transform: uppercase; color: var(--couleur-texte-gris); }
+
+
+    /* =============================================
+       SECTION GALERIE
+    ============================================= */
+    #galerie { background: #111; max-width: 100%; }
+    #galerie > div { max-width: 1100px; margin: 0 auto; padding: 80px 40px; }
+
+    /* Boutons de filtre */
+    .filtres { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 30px; }
+    .filtre-btn {
+      padding: 7px 22px;
+      border: 1px solid var(--couleur-texte-gris);
+      background: transparent;
+      color: var(--couleur-texte-gris);
+      font-family: 'Lato', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filtre-btn:hover, .filtre-btn.actif {
+      border-color: var(--couleur-accent);
+      color: var(--couleur-accent);
+    }
+
+    /* Grille photos */
+    .grille {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+    .vignette {
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+    }
+    .vignette img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+    .vignette:hover img { transform: scale(1.05); }
+    .vignette-info {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
+      padding: 20px 14px 12px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .vignette:hover .vignette-info { opacity: 1; }
+    .vignette-titre { font-size: 0.9rem; color: white; }
+    .vignette-cat   { font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--couleur-accent); }
+
+
+    /* =============================================
+       FENÊTRE POPUP (lightbox)
+    ============================================= */
+    .lightbox {
+      display: none;
+      position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,0.95);
+      align-items: center; justify-content: center;
+      padding: 30px;
+    }
+    .lightbox.ouvert { display: flex; }
+    .lb-interieur {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 50px; align-items: center; max-width: 960px; width: 100%;
+    }
+    .lb-interieur img { width: 100%; max-height: 75vh; object-fit: contain; }
+    .lb-texte h3  { font-size: 1.6rem; margin-bottom: 12px; }
+    .lb-texte p   { color: var(--couleur-texte-gris); }
+    .lb-texte .sous-titre { margin-bottom: 8px; }
+    .lb-fermer {
+      position: absolute; top: 20px; right: 28px;
+      font-size: 2rem; background: none; border: none;
+      color: var(--couleur-texte-gris); cursor: pointer;
+    }
+    .lb-fermer:hover { color: white; }
+
+
+    /* =============================================
+       SECTION CONTACT
+    ============================================= */
+    #contact { text-align: center; }
+    #contact > * { max-width: 600px; margin-left: auto; margin-right: auto; }
+
+    .contact-intro { color: var(--couleur-texte-gris); margin: 20px auto 36px; }
+
+    .formulaire { display: grid; gap: 12px; text-align: left; }
+    .formulaire input, .formulaire textarea {
+      width: 100%; padding: 12px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid #3a3530;
+      color: var(--couleur-texte);
+      font-family: 'Lato', sans-serif;
+      font-size: 1rem;
+      outline: none;
+    }
+    .formulaire input:focus, .formulaire textarea:focus { border-color: var(--couleur-accent); }
+    .formulaire textarea { height: 130px; resize: vertical; }
+    .formulaire input::placeholder, .formulaire textarea::placeholder { color: #4a4540; font-style: italic; }
+
+    .btn-envoyer {
+      padding: 12px 40px;
+      background: transparent;
+      border: 1px solid var(--couleur-accent);
+      color: var(--couleur-accent);
+      font-family: 'Lato', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-envoyer:hover { background: var(--couleur-accent); color: var(--couleur-fond); }
+
+    .coordonnees {
+      display: flex; justify-content: center; gap: 50px; flex-wrap: wrap;
+      margin-top: 50px; padding-top: 30px;
+      border-top: 1px solid #2a2520;
+    }
+    .coord-label { font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--couleur-accent); margin-bottom: 4px; }
+    .coord-valeur { color: var(--couleur-texte-gris); }
+
+
+    /* =============================================
+       PIED DE PAGE
+    ============================================= */
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.78rem;
+      letter-spacing: 2px;
+      color: #3a3530;
+      border-top: 1px solid #2a2520;
+    }
+
+
+    /* =============================================
+       RESPONSIVE MOBILE
+    ============================================= */
+    @media (max-width: 768px) {
+      nav ul { gap: 18px; }
+      .deux-colonnes { grid-template-columns: 1fr; }
+      .grille { grid-template-columns: 1fr 1fr; }
+      .hero-texte h1 { font-size: 3rem; }
+      .lb-interieur { grid-template-columns: 1fr; overflow-y: auto; max-height: 85vh; }
+    }
+    @media (max-width: 480px) {
+      .grille { grid-template-columns: 1fr; }
+      nav ul { display: none; }
+    }
+
+  </style>
+</head>
+<body>
+
+
+<!-- =============================================
+     BARRE DE NAVIGATION
+============================================= -->
+<nav>
+  <span class="nav-logo">Boris · Tailleur de Pierre</span>
+  <ul>
+    <li><a href="#accueil">Accueil</a></li>
+    <li><a href="#boris">À propos</a></li>
+    <li><a href="#galerie">Galerie</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+
+<!-- =============================================
+     PAGE D'ACCUEIL
+============================================= -->
+<section id="accueil">
+
+  <!-- PHOTO DE FOND — remplacez l'URL par : galerie/accueil/ma-photo.jpg -->
+  <div class="hero-photo"></div>
+
+  <!-- TITRE -->
+  <div class="hero-texte">
+    <h1>Boris</h1>
+    <p>Tailleur de Pierre · Strasbourg</p>
+  </div>
+
+  <!-- POINTS CLIQUABLES SUR LA PHOTO
+       Déplacez-les en changeant les % de top/left dans le CSS (.hs-boris, .hs-galerie, .hs-contact) -->
+  <a class="hotspot hs-boris"   href="#boris">
+    <div class="hotspot-rond"></div>
+    <span class="hotspot-label">À propos de Boris</span>
+  </a>
+  <a class="hotspot hs-galerie" href="#galerie">
+    <div class="hotspot-rond"></div>
+    <span class="hotspot-label">Galerie</span>
+  </a>
+  <a class="hotspot hs-contact" href="#contact">
+    <div class="hotspot-rond"></div>
+    <span class="hotspot-label">Contact</span>
+  </a>
+
+</section>
+
+
+<!-- =============================================
+     À PROPOS DE BORIS
+============================================= -->
+<section id="boris">
+  <div class="deux-colonnes">
+
+    <!-- PHOTO — remplacez l'URL par : galerie/portrait/boris.jpg -->
+    <img class="photo-boris"
+         src="https://images.unsplash.com/photo-1503455637927-730bce8583c0?w=800&q=80"
+         alt="Boris, tailleur de pierre">
+
+    <div class="texte-section">
+      <p class="sous-titre">L'artisan</p>
+      <h2>Un métier millénaire</h2>
+
+      <p>Boris est tailleur de pierre depuis plus de quinze ans. Formé selon la tradition
+      compagnonnique, il a consacré sa carrière à la sauvegarde et à la restauration
+      du patrimoine bâti français.</p>
+
+      <p>Aujourd'hui, il travaille sur la <strong>Cathédrale Notre-Dame de Strasbourg</strong>,
+      monument gothique classé au Patrimoine mondial de l'UNESCO.</p>
+
+      <blockquote class="citation">
+        « La pierre parle à qui sait l'écouter. Mon rôle est de révéler ce qu'elle cache. »
+      </blockquote>
+
+      <p>Boris propose ses services à des particuliers, collectivités et architectes :
+      sculptures ornementales, lettrage gravé, restauration de façades, éléments
+      architecturaux sur mesure.</p>
+
+      <!-- CHIFFRES CLÉS -->
+      <div class="stats">
+        <div>
+          <div class="stat-chiffre">15+</div>
+          <div class="stat-texte">Années d'expérience</div>
+        </div>
+        <div>
+          <div class="stat-chiffre">4</div>
+          <div class="stat-texte">Cathédrales restaurées</div>
+        </div>
+        <div>
+          <div class="stat-chiffre">100%</div>
+          <div class="stat-texte">Sur mesure</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- =============================================
+     GALERIE
+============================================= -->
+<section id="galerie">
+  <div>
+    <p class="sous-titre">Réalisations</p>
+    <h2>Galerie</h2>
+
+    <div class="filtres">
+      <button class="filtre-btn actif" data-cat="tout">Tout</button>
+      <button class="filtre-btn" data-cat="sculpture">Sculptures</button>
+      <button class="filtre-btn" data-cat="gravure">Gravures</button>
+      <button class="filtre-btn" data-cat="monument">Monuments historiques</button>
+      <button class="filtre-btn" data-cat="architecture">Architecture</button>
+    </div>
+
+    <!-- La grille est remplie automatiquement par le JavaScript ci-dessous -->
+    <div class="grille" id="grille"></div>
+  </div>
+</section>
+
+
+<!-- =============================================
+     CONTACT
+============================================= -->
+<section id="contact">
+  <p class="sous-titre">Parlons de votre projet</p>
+  <h2>Contact</h2>
+  <p class="contact-intro">Sculpture, gravure, restauration ou création sur mesure —
+  décrivez votre projet et je vous réponds rapidement.</p>
+
+  <div class="formulaire">
+    <input  type="text"  placeholder="Votre nom">
+    <input  type="email" placeholder="Votre email">
+    <input  type="text"  placeholder="Sujet">
+    <textarea            placeholder="Décrivez votre projet…"></textarea>
+    <button class="btn-envoyer">Envoyer</button>
+  </div>
+
+  <!-- COORDONNÉES — modifiez ici -->
+  <div class="coordonnees">
+    <div>
+      <div class="coord-label">Téléphone</div>
+      <div class="coord-valeur">+33 6 00 00 00 00</div>
+    </div>
+    <div>
+      <div class="coord-label">Email</div>
+      <div class="coord-valeur">boris@tailleurdepierre.fr</div>
+    </div>
+    <div>
+      <div class="coord-label">Zone</div>
+      <div class="coord-valeur">Alsace &amp; toute la France</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- PIED DE PAGE -->
+<footer>© 2025 Boris — Tailleur de Pierre · Strasbourg</footer>
+
+
+<!-- POPUP GALERIE -->
+<div class="lightbox" id="lightbox">
+  <button class="lb-fermer" onclick="fermerLightbox()">✕</button>
+  <div class="lb-interieur">
+    <img id="lb-img" src="" alt="">
+    <div class="lb-texte">
+      <p class="sous-titre" id="lb-cat"></p>
+      <h3 id="lb-titre"></h3>
+      <p  id="lb-desc"></p>
+    </div>
+  </div>
+</div>
+
+
+<!-- =============================================
+     GALERIE — AJOUTEZ VOS PHOTOS ICI
+
+     Pour chaque œuvre, copiez un bloc { ... }, et modifiez :
+       titre       : nom de l'œuvre
+       categorie   : "sculpture" | "gravure" | "monument" | "architecture"
+       description : texte affiché dans la popup au clic
+       image       : chemin vers la photo (ex: "galerie/sculpture/mon-oeuvre.jpg")
+============================================= -->
+<script>
+
+const oeuvres = [
+  {
+    titre:       "Chapiteau floral",
+    categorie:   "sculpture",
+    description: "Chapiteau sculpté à la main en calcaire de Bourgogne. Motifs de feuilles d'acanthe inspirés de l'art roman. Réalisé pour une propriété privée en Alsace.",
+    image:       "https://images.unsplash.com/photo-1604928141064-207cea6f571f?w=900&q=80"
+  },
+  {
+    titre:       "Médaillon portrait",
+    categorie:   "sculpture",
+    description: "Portrait en bas-relief sur pierre de taille. Technique de taille directe, sans moulage préalable.",
+    image:       "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=900&q=80"
+  },
+  {
+    titre:       "Inscription funéraire",
+    categorie:   "gravure",
+    description: "Lettrage gravé en creux sur marbre noir. Polices romaines tracées à la main, taille au ciseau à bout plat.",
+    image:       "https://images.unsplash.com/photo-1567416661576-659d1f16bd80?w=900&q=80"
+  },
+  {
+    titre:       "Armoiries familiales",
+    categorie:   "gravure",
+    description: "Armoiries gravées sur calcaire coquillier de Provence. Travail d'après document d'archive héraldique.",
+    image:       "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=900&q=80"
+  },
+  {
+    titre:       "Crochet gothique — Cathédrale de Strasbourg",
+    categorie:   "monument",
+    description: "Remplacement d'un crochet gothique sur la façade nord. Grès rose des Vosges, taillé à l'identique de l'original du XIVe siècle.",
+    image:       "https://images.unsplash.com/photo-1548690312-e3b507d8c110?w=900&q=80"
+  },
+  {
+    titre:       "Restitution d'une clé de voûte",
+    categorie:   "monument",
+    description: "Reconstruction d'une clé de voûte nervurée gothique. Grès rose des Vosges, taille à la rustique sur les faces vues.",
+    image:       "https://images.unsplash.com/photo-1548264662-f60e4c43e03b?w=900&q=80"
+  },
+  {
+    titre:       "Linteau monolithique",
+    categorie:   "architecture",
+    description: "Linteau en granit bleu breton pour une maison contemporaine. Dimensions : 220 × 32 × 28 cm. Résistant au gel.",
+    image:       "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=900&q=80"
+  },
+  {
+    titre:       "Escalier en pierre bleue",
+    categorie:   "architecture",
+    description: "Escalier extérieur à 7 marches en pierre bleue de Belgique, taillé sur mesure. Résistance au gel garantie.",
+    image:       "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&q=80"
+  }
+];
+
+
+/* — Le reste est automatique, pas besoin de toucher — */
+
+function construireGrille(filtre) {
+  const grille = document.getElementById('grille');
+  grille.innerHTML = '';
+  const liste = filtre === 'tout' ? oeuvres : oeuvres.filter(o => o.categorie === filtre);
+  liste.forEach(o => {
+    const i = oeuvres.indexOf(o);
+    const div = document.createElement('div');
+    div.className = 'vignette';
+    div.innerHTML = `
+      <img src="${o.image}" alt="${o.titre}" loading="lazy">
+      <div class="vignette-info">
+        <div class="vignette-cat">${o.categorie}</div>
+        <div class="vignette-titre">${o.titre}</div>
+      </div>`;
+    div.onclick = () => ouvrirLightbox(i);
+    grille.appendChild(div);
+  });
+}
+
+function ouvrirLightbox(i) {
+  const o = oeuvres[i];
+  document.getElementById('lb-img').src             = o.image;
+  document.getElementById('lb-cat').textContent     = o.categorie.toUpperCase();
+  document.getElementById('lb-titre').textContent   = o.titre;
+  document.getElementById('lb-desc').textContent    = o.description;
+  document.getElementById('lightbox').classList.add('ouvert');
+}
+
+function fermerLightbox() {
+  document.getElementById('lightbox').classList.remove('ouvert');
+}
+
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target === document.getElementById('lightbox')) fermerLightbox();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') fermerLightbox(); });
+
+document.querySelectorAll('.filtre-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filtre-btn').forEach(b => b.classList.remove('actif'));
+    btn.classList.add('actif');
+    construireGrille(btn.dataset.cat);
+  });
+});
+
+construireGrille('tout');
+</script>
+
+</body>
+</html>
